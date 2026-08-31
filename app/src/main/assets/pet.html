@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    width: 100%; height: 100%;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#pet-container {
+    position: absolute;
+    width: 140px; height: 160px;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* 身体 - 螃蟹壳 */
+#body {
+    position: absolute;
+    width: 80px; height: 65px;
+    background: #E8734A;
+    border-radius: 50% 50% 40% 40%;
+    left: 30px; top: 45px;
+    transition: transform 0.3s ease;
+    box-shadow: inset 0 -4px 0 #D4623B;
+}
+
+/* 肚皮 */
+#belly {
+    position: absolute;
+    width: 44px; height: 30px;
+    background: #F5C5A3;
+    border-radius: 50%;
+    left: 48px; top: 72px;
+    z-index: 1;
+}
+
+/* 眼睛柄 */
+.eye-stalk {
+    position: absolute;
+    width: 6px; height: 18px;
+    background: #E8734A;
+    border-radius: 3px;
+    top: 30px;
+    z-index: 2;
+}
+.eye-stalk.left { left: 48px; transform: rotate(-8deg); }
+.eye-stalk.right { right: 48px; transform: rotate(8deg); }
+
+/* 眼睛 */
+.eye {
+    position: absolute;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 22px;
+    z-index: 3;
+    transition: all 0.2s ease;
+}
+.eye.left { left: 42px; }
+.eye.right { right: 42px; }
+.pupil {
+    position: absolute;
+    width: 9px; height: 9px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    top: 5px; left: 5px;
+    transition: all 0.15s ease;
+}
+.eye-highlight {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: white;
+    border-radius: 50%;
+    top: 4px; left: 7px;
+}
+
+/* 叉叉眼 */
+.eye.xx .pupil, .eye.xx .eye-highlight { display: none; }
+.eye.xx::after {
+    content: '\00d7';
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a1a1a; font-size: 14px; font-weight: bold;
+}
+
+/* 闭眼 */
+.eye.closed {
+    height: 3px;
+    top: 30px;
+    border-radius: 2px;
+    background: #1a1a1a;
+}
+.eye.closed .pupil, .eye.closed .eye-highlight { display: none; }
+
+/* 嘴 */
+#mouth {
+    position: absolute;
+    width: 12px; height: 6px;
+    border-bottom: 2px solid #C0513A;
+    border-radius: 0 0 50% 50%;
+    left: 34px; top: 37px;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+#mouth.open {
+    width: 16px; height: 12px;
+    background: #ff6b81;
+    border: none;
+    border-radius: 50%;
+    left: 32px; top: 35px;
+}
+#mouth.pout {
+    width: 8px; height: 8px;
+    background: none;
+    border: 2px solid #C0513A;
+    border-radius: 50%;
+    left: 36px; top: 35px;
+}
+
+/* 腮红 */
+.blush {
+    position: absolute;
+    width: 14px; height: 9px;
+    background: rgba(255,120,120,0.45);
+    border-radius: 50%;
+    top: 31px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+}
+.blush.left { left: 4px; }
+.blush.right { right: 4px; }
+.blush.show { opacity: 1; }
+
+/* 大钳子 */
+.claw {
+    position: absolute;
+    top: 55px;
+    z-index: 0;
+}
+.claw.left { left: 0; }
+.claw.right { right: 0; }
+
+.claw-arm {
+    width: 18px; height: 8px;
+    background: #E8734A;
+    border-radius: 4px;
+}
+.claw.left .claw-arm { transform: rotate(15deg); margin-left: 8px; }
+.claw.right .claw-arm { transform: rotate(-15deg); margin-left: 2px; }
+
+.pincer {
+    position: relative;
+    width: 24px; height: 22px;
+}
+.claw.left .pincer { margin-left: -2px; }
+.claw.right .pincer { margin-left: 4px; }
+
+.pincer-top, .pincer-bottom {
+    position: absolute;
+    width: 18px; height: 11px;
+    background: #E8734A;
+    left: 0;
+}
+.pincer-top {
+    border-radius: 12px 12px 0 0;
+    top: 0;
+    transform-origin: bottom right;
+    animation: pincerSnap 3s ease-in-out infinite;
+}
+.pincer-bottom {
+    border-radius: 0 0 12px 12px;
+    top: 11px;
+}
+
+.claw.left .pincer-top { transform-origin: bottom right; }
+.claw.right .pincer-top { transform-origin: bottom left; }
+
+@keyframes pincerSnap {
+    0%, 80%, 100% { transform: rotate(0); }
+    85% { transform: rotate(-12deg); }
+    90% { transform: rotate(0); }
+    93% { transform: rotate(-8deg); }
+    96% { transform: rotate(0); }
+}
+.claw.right .pincer-top {
+    animation: pincerSnapR 3s ease-in-out infinite;
+    animation-delay: 0.4s;
+}
+@keyframes pincerSnapR {
+    0%, 80%, 100% { transform: rotate(0); }
+    85% { transform: rotate(12deg); }
+    90% { transform: rotate(0); }
+    93% { transform: rotate(8deg); }
+    96% { transform: rotate(0); }
+}
+
+/* 小腿 */
+.legs {
+    position: absolute;
+    top: 95px;
+    left: 30px;
+    width: 80px;
+    height: 20px;
+    z-index: 0;
+}
+.leg {
+    position: absolute;
+    width: 5px; height: 16px;
+    background: #D4623B;
+    border-radius: 2px;
+    bottom: 0;
+    transform-origin: top center;
+}
+.leg:nth-child(1) { left: 6px; transform: rotate(-15deg); }
+.leg:nth-child(2) { left: 20px; transform: rotate(-5deg); }
+.leg:nth-child(3) { left: 34px; transform: rotate(0deg); }
+.leg:nth-child(4) { right: 34px; transform: rotate(0deg); }
+.leg:nth-child(5) { right: 20px; transform: rotate(5deg); }
+.leg:nth-child(6) { right: 6px; transform: rotate(15deg); }
+
+.legs.walking .leg:nth-child(odd) {
+    animation: legWalkA 0.8s ease-in-out infinite;
+}
+.legs.walking .leg:nth-child(even) {
+    animation: legWalkB 0.8s ease-in-out infinite;
+}
+@keyframes legWalkA {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+@keyframes legWalkB {
+    0%, 100% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+/* 气泡 */
+#bubble {
+    position: absolute;
+    bottom: 165px; left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+#bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid white;
+}
+#bubble.show { opacity: 1; }
+#bubble.pink { background: #fff0f3; }
+#bubble.pink::after { border-top-color: #fff0f3; }
+#bubble.red { background: #ffe0e0; color: #c00; }
+#bubble.red::after { border-top-color: #ffe0e0; }
+#bubble.green { background: #e8f5e9; color: #2e7d32; }
+#bubble.green::after { border-top-color: #e8f5e9; }
+
+/* ZZZ */
+#zzz {
+    position: absolute;
+    top: 15px; right: 10px;
+    font-size: 14px;
+    color: #999;
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: 5;
+}
+#zzz.show {
+    opacity: 1;
+    animation: float 2s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* 动画 */
+@keyframes shake {
+    0%, 100% { transform: translate(-50%,-50%) rotate(0); }
+    20% { transform: translate(-50%,-50%) rotate(-8deg); }
+    40% { transform: translate(-50%,-50%) rotate(8deg); }
+    60% { transform: translate(-50%,-50%) rotate(-5deg); }
+    80% { transform: translate(-50%,-50%) rotate(5deg); }
+}
+#pet-container.shake { animation: shake 0.4s ease; }
+
+@keyframes bounce {
+    0%, 100% { transform: translate(-50%,-50%) scaleY(1); }
+    30% { transform: translate(-50%,-50%) scaleY(0.85) scaleX(1.1); }
+    50% { transform: translate(-50%,-50%) scaleY(1.12) scaleX(0.92); }
+    70% { transform: translate(-50%,-50%) scaleY(0.97); }
+}
+#pet-container.bounce { animation: bounce 0.5s ease; }
+
+@keyframes sideWalk {
+    0% { transform: translate(-50%,-50%) translateX(0); }
+    25% { transform: translate(-50%,-50%) translateX(-8px) rotate(-3deg); }
+    75% { transform: translate(-50%,-50%) translateX(8px) rotate(3deg); }
+    100% { transform: translate(-50%,-50%) translateX(0); }
+}
+#pet-container.sideWalk { animation: sideWalk 0.8s ease; }
+
+@keyframes flyOff {
+    0% { transform: translate(-50%,-50%) rotate(0); opacity:1; }
+    100% { transform: translate(300px,-200px) rotate(720deg); opacity:0; }
+}
+@keyframes crawlBack {
+    0% { transform: translate(300px,-200px) rotate(0); opacity:0; }
+    30% { opacity:1; }
+    100% { transform: translate(-50%,-50%) rotate(0); opacity:1; }
+}
+#pet-container.flyOff { animation: flyOff 0.6s ease-in forwards; }
+#pet-container.crawlBack { animation: crawlBack 1.2s ease-out forwards; }
+
+</style>
+</head>
+<body>
+
+<div id="bubble"></div>
+<div id="pet-container">
+    <div class="claw left">
+        <div class="claw-arm"></div>
+        <div class="pincer">
+            <div class="pincer-top"></div>
+            <div class="pincer-bottom"></div>
+        </div>
+    </div>
+    <div class="claw right">
+        <div class="claw-arm"></div>
+        <div class="pincer">
+            <div class="pincer-top"></div>
+            <div class="pincer-bottom"></div>
+        </div>
+    </div>
+
+    <div class="eye-stalk left"></div>
+    <div class="eye-stalk right"></div>
+
+    <div class="eye left" id="eyeL">
+        <div class="pupil"></div>
+        <div class="eye-highlight"></div>
+    </div>
+    <div class="eye right" id="eyeR">
+        <div class="pupil"></div>
+        <div class="eye-highlight"></div>
+    </div>
+
+    <div id="body">
+        <div class="blush left" id="blushL"></div>
+        <div class="blush right" id="blushR"></div>
+        <div id="mouth"></div>
+    </div>
+    <div id="belly"></div>
+
+    <div class="legs" id="legs">
+        <div class="leg"></div>
+        <div class="leg"></div>
+        <div class="leg"></div>
+        <div class="leg"></div>
+        <div class="leg"></div>
+        <div class="leg"></div>
+    </div>
+
+    <div id="zzz">Z z z</div>
+</div>
+
+<script>
+const pet = document.getElementById('pet-container');
+const bubble = document.getElementById('bubble');
+const eyeL = document.getElementById('eyeL');
+const eyeR = document.getElementById('eyeR');
+const mouth = document.getElementById('mouth');
+const blushL = document.getElementById('blushL');
+const blushR = document.getElementById('blushR');
+const zzz = document.getElementById('zzz');
+const legs = document.getElementById('legs');
+
+let bubbleTimer = null;
+let blinkInterval = null;
+let currentState = 'idle';
+
+function showBubble(text, style, duration) {
+    if (bubbleTimer) clearTimeout(bubbleTimer);
+    bubble.textContent = text;
+    bubble.className = 'show ' + (style || '');
+    bubbleTimer = setTimeout(() => { bubble.className = ''; }, duration || 3000);
+}
+
+function blink() {
+    eyeL.classList.add('closed');
+    eyeR.classList.add('closed');
+    setTimeout(() => {
+        if (currentState !== 'sleep') {
+            eyeL.classList.remove('closed');
+            eyeR.classList.remove('closed');
+        }
+    }, 150);
+}
+
+function startBlink() {
+    if (blinkInterval) clearInterval(blinkInterval);
+    blinkInterval = setInterval(() => {
+        if (currentState !== 'sleep' && Math.random() > 0.4) blink();
+    }, 3000);
+}
+
+function showBlush(on) {
+    blushL.classList.toggle('show', on);
+    blushR.classList.toggle('show', on);
+    if (on) setTimeout(() => showBlush(false), 3000);
+}
+
+function setXX(on) {
+    eyeL.classList.toggle('xx', on);
+    eyeR.classList.toggle('xx', on);
+}
+
+function startWalk() { legs.classList.add('walking'); }
+function stopWalk() { legs.classList.remove('walking'); }
+
+function sleep() {
+    currentState = 'sleep';
+    eyeL.classList.add('closed');
+    eyeR.classList.add('closed');
+    mouth.className = '';
+    zzz.classList.add('show');
+    stopWalk();
+}
+
+function wake() {
+    currentState = 'idle';
+    eyeL.classList.remove('closed');
+    eyeR.classList.remove('closed');
+    eyeL.classList.remove('xx');
+    eyeR.classList.remove('xx');
+    zzz.classList.remove('show');
+}
+
+function playAnim(name, dur) {
+    pet.classList.remove('shake','bounce','flyOff','crawlBack','sideWalk');
+    void pet.offsetWidth;
+    pet.classList.add(name);
+    setTimeout(() => pet.classList.remove(name), dur || 500);
+}
+
+const tapBubbles = ['?','嗯？','干嘛戳我','（挥钳子）','夹你哦','别戳了'];
+const comboBubbles3 = ['夹夹夹！','你够了！','钳子不是摆设'];
+const comboBubbles5 = ['救命！','要散架了！','钳子都歪了！'];
+const comboBubbles8 = ['...你赢了','我横着走给你看','投降（挥白旗）'];
+
+window.petEngine = {
+    onTap() {
+        wake();
+        playAnim('bounce', 500);
+        showBubble(tapBubbles[Math.floor(Math.random()*tapBubbles.length)]);
+    },
+
+    onDoubleTap() {
+        wake();
+        showBlush(true);
+        mouth.className = 'open';
+        showBubble('！', 'pink');
+        playAnim('sideWalk', 800);
+        startWalk();
+        setTimeout(() => { mouth.className = ''; stopWalk(); }, 1500);
+    },
+
+    onLongPress() {
+        wake();
+        showBlush(true);
+        mouth.className = 'pout';
+        showBubble('...一直按着想干嘛', 'pink');
+        setTimeout(() => { mouth.className = ''; }, 2500);
+    },
+
+    onComboTap(n) {
+        wake();
+        playAnim('shake', 400);
+        if (n >= 8) {
+            setXX(true);
+            showBubble(comboBubbles8[Math.floor(Math.random()*comboBubbles8.length)], 'red');
+            startWalk();
+            setTimeout(() => { setXX(false); stopWalk(); }, 3000);
+        } else if (n >= 5) {
+            setXX(true);
+            showBubble(comboBubbles5[Math.floor(Math.random()*comboBubbles5.length)], 'red');
+            setTimeout(() => setXX(false), 2000);
+        } else {
+            showBubble(comboBubbles3[Math.floor(Math.random()*comboBubbles3.length)]);
+        }
+    },
+
+    onFling() {
+        pet.classList.add('flyOff');
+        showBubble('啊啊啊啊！', 'red');
+        setTimeout(() => {
+            pet.classList.remove('flyOff');
+            pet.classList.add('crawlBack');
+            startWalk();
+            showBubble('...横着爬回来了', '', 3000);
+            setTimeout(() => {
+                pet.classList.remove('crawlBack');
+                stopWalk();
+                wake();
+            }, 1200);
+        }, 700);
+    },
+
+    onDragEnd() {
+        showBubble('晕...', '', 1500);
+        stopWalk();
+    },
+
+    onScreenshot() {
+        wake();
+        showBlush(true);
+        mouth.className = 'open';
+        showBubble('被拍到了！（举钳子）', 'pink', 3000);
+        playAnim('bounce', 500);
+        setTimeout(() => { mouth.className = ''; }, 2000);
+    },
+
+    onAppChanged(pkg) {
+        if (currentState === 'sleep') return;
+        if (pkg.includes('douyin') || pkg.includes('tiktok')) {
+            showBubble('又刷...', '', 4000);
+        } else if (pkg.includes('taobao') || pkg.includes('jd')) {
+            showBubble('要买什么？', '', 3000);
+        } else if (pkg.includes('camera')) {
+            showBlush(true);
+            showBubble('拍我拍我！', 'pink', 3000);
+        } else if (pkg.includes('game') || pkg.includes('mihoyo') || pkg.includes('hypergryph')) {
+            showBubble('打游戏去了...', '', 3000);
+        } else if (pkg.includes('weixin') || pkg.includes('wechat')) {
+            showBubble('跟谁聊呢', 'green', 3000);
+        } else if (pkg.includes('qq')) {
+            showBubble('QQ上跟谁说话呢', 'green', 3000);
+        }
+    },
+
+    onIdle(minutes) {
+        if (minutes <= 5) {
+            showBubble('...', '', 3000);
+        } else if (minutes <= 10) {
+            showBubble('你不理我吗', '', 4000);
+            playAnim('sideWalk', 800);
+        } else if (minutes <= 15) {
+            showBubble('好无聊（吐泡泡）', '', 4000);
+            mouth.className = 'pout';
+            setTimeout(() => { mouth.className = ''; }, 4000);
+        } else if (minutes <= 20) {
+            blink();
+            showBubble('困了...', '', 4000);
+        } else {
+            sleep();
+        }
+    },
+
+    onWake() { wake(); },
+
+    say(text, style) { wake(); showBubble(text, style || '', 5000); },
+    setMood(mood) {
+        wake();
+        if (mood === 'happy') {
+            showBlush(true); mouth.className = 'open';
+            playAnim('sideWalk', 800); startWalk();
+            setTimeout(() => { mouth.className = ''; stopWalk(); }, 3000);
+        } else if (mood === 'angry') {
+            setXX(true); playAnim('shake', 400);
+            setTimeout(() => setXX(false), 3000);
+        } else if (mood === 'shy') {
+            showBlush(true); mouth.className = 'pout';
+            setTimeout(() => { mouth.className = ''; }, 3000);
+        } else if (mood === 'sleep') {
+            sleep();
+        } else {
+            mouth.className = '';
+        }
+    }
+};
+
+startBlink();
+showBubble('来了', '', 2000);
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="#FFF5F5F5">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🐾 桌宠"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="检查权限中..."
+        android:textSize="15sp"
+        android:lineSpacingExtra="6dp"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/toggle_btn"
+        android:layout_width="240dp"
+        android:layout_height="56dp"
+        android:text="启动桌宠"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btn_usage_perm"
+        android:layout_width="240dp"
+        android:layout_height="48dp"
+        android:text="授权使用情况"
+        android:textSize="14sp"
+        android:backgroundTint="#FF9E9E9E"/>
+
+</LinearLayout>
